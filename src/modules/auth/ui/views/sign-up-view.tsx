@@ -15,11 +15,12 @@ import {
     FormMessage,
 } from "@/components/ui/form";
 import { OctagonAlertIcon } from "lucide-react";
+import { FaGithub, FaGoogle } from "react-icons/fa";
 import { authClient } from "@/lib/auth-client";
 import { useForm } from "react-hook-form";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 
 const formSchema = z.object({
     name: z.string().min(1, { message: "Name is required" }),
@@ -34,9 +35,9 @@ const formSchema = z.object({
 
 
 const SignUpView = () => {
-    const router = useRouter();
     const [error, setError] = useState<string | null>(null);
     const [pending, setPending] = useState(false);
+    const router = useRouter();
     const form = useForm<z.infer<typeof formSchema>>({
         resolver: zodResolver(formSchema),
         defaultValues: {
@@ -55,10 +56,11 @@ const SignUpView = () => {
                 name: data.name,
                 email: data.email,
                 password: data.password,
+                callbackURL: '/'
             },
             {
                 onSuccess: () => {
-                    router.push("/");
+                    router.push('/');
                     setPending(false);
                 },
                 onError: ({ error }) => {
@@ -67,9 +69,25 @@ const SignUpView = () => {
                 }
             }
         );
-
-
-
+    }
+    const onSocial = (provider: 'github' | 'google') => {
+        setError(null);
+        setPending(true);
+        authClient.signIn.social(
+            {
+                provider: provider,
+                callbackURL: '/'
+            },
+            {
+                onSuccess: () => {
+                    setPending(false);
+                },
+                onError: ({ error }) => {
+                    setPending(false);
+                    setError(error.message);
+                }
+            }
+        );
     }
 
     return (
@@ -193,8 +211,16 @@ const SignUpView = () => {
                                     </span>
                                 </div>
                                 <div className="grid grid-cols-2 gap-4">
-                                    <Button disabled={pending} variant="outline" className="w-full">Google</Button>
-                                    <Button disabled={pending} variant="outline" className="w-full">Github</Button>
+                                    <Button
+                                        onClick={() => onSocial("google")}
+                                        disabled={pending} variant="outline" type="button" className="w-full">
+                                        <FaGoogle />
+                                    </Button>
+                                    <Button type="button"
+                                        onClick={() => onSocial("github")}
+                                        disabled={pending} variant="outline" className="w-full">
+                                        <FaGithub />
+                                    </Button>
                                 </div>
                                 <div className="text-center text-sm">
                                     Already have an account? <Link className="underline underline-offset-4" href="/sign-in">Sign in</Link>
