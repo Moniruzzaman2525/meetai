@@ -11,7 +11,6 @@ export const NewMeetingsDialogue = ({ open, onOpenChange }: NewMeetingsDialogueP
     return (
         <div>
             <ResponsiveDialog open={open} onOpenChange={onOpenChange} title="New Meeting" description="Create a new meeting">
-                {/* <AgentFrom onSuccess={() => onOpenChange(false)} onCancel={() => onOpenChange(false)} /> */}
                 <MeetingFrom onSuccess={(id) => {
                     onOpenChange(false)
                     router.push(`/meetings/${id}`)
